@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+    
+  </head>
+  <body>
+    <div class="center">
+        <a href="./index.html">Back to homepage</a>
+        <h1>Dependency Misinjection</h1>
+        <p><i>Posted on February 7, 2017</i></p>
+
+<p>
+It was after a while I have once again engaged in a discussion about dependency injection in spring and how to handle it in tests. This is not the first time so I am writing my thoughts down to point here in any further conversations.
+</p>
+<p>
+Autowired annotation poisoned our code and way of thinking. Do you miss something in this class just simply autowire this and that and you are done. This sort of thinking is almost perverse. Writing good software requires thinking about design not simply autowiring everything.
+</p>
+<h2>So is autowiring bad?</h2>
+<p>
+Not at all. Dependency injection is great tool, but there are some boundaries you should not cross.
+If I should recomend one thing about DI it would be:
+</p>
+<p><b>Always use constructor injection</b></p>
+<p>
+Constructor injection communicates dependencies well.</br>
+You will never be able to create invalid object (ignoring passing null). </br>
+<b>And most importantly it slaps you in the face with your badly designed code!</b> I always hear that having constructor with ten dependencies is not good. Yeah it is not. But what is wrong is your class depending on so much other modules, not the constructor itself. If your component requires ton of dependent components it indicates that you are doing something wrong - most probably violating <a href="http://butunclebob.com/ArticleS.UncleBob.PrinciplesOfOod">SRP</a>, or you are lacking necessary abstraction. I cannot stress this out enough. 
+</p>
+<p>
+And what about optional dependencies? I would preffer overloaded constructors in that case and if possible setting those dependencies to <a href="https://martinfowler.com/eaaCatalog/specialCase.html">null objects</a> not nulls. But in this case setters are <a href="https://xkcd.com/292/">tolerable</a>.
+</p>
+<p>
+But what if I need change dependency once instance was created? This is not really problem of DI, but you relying on mutability of object in you architecture.
+</p>
+<p>
+But wouldn't this create a lot of small classes? Yes it would and it is a good thing. Small composable classes and interfaces or functions are building objects of every good software. Not thousand line long ServiceImpl classes with tens of autowired dependencies. You cannot reuse any of that. Only way how to reuse this monster is to add new method to it and use it whole in the client. This lack of composability lead developers to compose behavior using abstract classes which contains shared behavior. This is clearly abuse of class inheritance. 
+</p>
+<p>
+Wouldn't this slow me down? I mean, all those classes and constructors! If you think creating good design will slow you down <a href="https://twitter.com/compscifact/status/664484395127062528">you probably need to slow down</a>.
+</p>
+<center>
+<img src="./img/busy_to_improve.png" alt="Drawing - busy to improve" style="width: 500px;"/></br>
+<i><a href="https://commons.wikimedia.org/wiki/File:Too_Busy_To_Improve_-_Performance_Management_-_Square_Wheels.png">Image source</a></i></center>
+<p>
+So how do I mock in tests? I try to avoid mock libraries. I tend to create real objects usually. When you have small components it is usually very easy to write dummy implementations right in place in test - even as simple lambdas in java 8. I love this  quote by [Rich Hickey](https://twitter.com/richhickey?lang=en)
+ </p>
+<blockquote>
+Your mock object is a joke; that object is mocking you. For needing it.
+</blockquote>
+<p>
+As you see one bad decision led us not to reverting it but to making other bad decisions based on the first one. 
+Our reply to "I tried to instantiate this class in test and it is a pain and I had to use reflection to set all twenty dependencies" should be "maybe there is something wrong with our code" not "cool idea lets make it a&nbsp;standard".
+</p>
+<p>
+This is why well designed and clean code matters. Because someone will use it as cornerstone to his work. This snowball effect has been observed <a href="https://en.wikipedia.org/wiki/Broken_windows_theory">also as social behavior</a>.
+</p>
+<h2>Related articles</h2>
+<a href="http://vojtechruzicka.com/field-dependency-injection-considered-harmful/">Field Dependency Injection Considered Harmful</a> with more detailed description of injection types 
+</br>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>

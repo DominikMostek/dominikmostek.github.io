@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  </head>
+  <body>
+    <div class="center">
+        <a href="./index.html">Back to homepage</a>
+        <h1>Why TDD does not work</h1>
+        <p><i>Posted on November 12, 2021</i></p>
+Test-driven development. For many a holy grail for many a useless technique.
+
+I have written some posts about TDD in the past:
+<ul>
+    <li><a href="./2019-03-28-tests-no-way-from-misery.html">Tests are not a way out of misery</a>
+    <li><a href="./2017-03-06-tdd-intro.html">TDD tips</a>
+</ul>
+
+<p>
+    But today I want to focus on one thing in particular: why it does not work.
+</p>
+<p>
+First things first, what is TDD? I will go with a quick definition. 
+It's a technique of writing code when you write tests before actual implementation. Ok but why? The reason is to have well-designed code.
+</p>
+What is well-designed code? It does not matter actually. 
+What does matter is the goal is some design. The test is here just to guide you to it. 
+<p>
+But do you need this guide? Of course not. 
+You can achieve the same design, as with TDD, by using your experience, by learning, or just randomly.
+</p>
+<p>
+That's the reason why TDD might not be the best tool for you. If you are well educated and experienced then you don't need to write the a first to guide you.
+</p>
+<p>
+But how exactly are the tests guiding you to a better design? By definition it is by forcing you to use your code before you write it. 
+The premise is that you will write a better API of your code if you are acting as a consumer of this API first. The problem is that this premise is not always true.
+</p>
+Consider this example <a href="https://stackoverflow.com/questions/42573000/java-unit-testing-method-that-uses-new-date-for-current-date">found on Stackoverflow</a>
+
+<pre class="prettyprint lang-java">
+@Test 
+public void daysUntilCurrentDate() {
+    final long fakeCurrentDateInMillis = new Date(2017, 2, 1).getTime();
+    new MockUp<System>() {
+        @Mock long currentTimeMillis() { return fakeCurrentDateInMillis; }
+    };
+    A tested = new A();
+
+    int daysSinceJan30 = tested.getDaysUntil(new Date(2017, 1, 30));
+
+    assertEquals(2, daysSinceJan3O);
+}
+</pre>
+<p>
+Let's say it was written before class <span class="inline-code">A</span> so with the TDD approach. Is <span class="inline-code">A</span> well designed? I personally don’t think so, because it's not clear where it gets its dates from, and it's not possible to inject another source of dates. But John, author of this code, thinks it's not a problem a this is the best design possible. Has TDD proved him wrong? Not at all, he just had to write an extra test.
+</p>
+<p>
+And that is another reason why TDD is not working. It has a prerequisite of knowing good design principles before you write the test. If you don’t write a well-designed test it won’t guide you to a well-designed code and will be just an extra burden.
+</p>
+<p>
+TDD will work only when you study the code design first and will stop working after you gain so much experience that you can create the same design without writing the guiding test first.
+</p>
+
+</div>
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>
+
+
+
+

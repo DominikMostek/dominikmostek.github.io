@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+    
+  </head>
+  <body>
+    <div class="center">
+        <a href="./index.html">Back to homepage</a>
+        <h1>Domain objects rocks!</h1>
+        <p><i>Posted on July 30, 2017</i></p>
+
+<p>
+Today I am going to tell you a little secret. It must be a secret since almost no programmers seems to know about it. Modeling your code based on your domain is the key to maintainable codebase! 
+</p>
+<p>
+It actually is not secret, it is a well known anti-pattern to use <a href="http://wiki.c2.com/?PrimitiveObsession">primitive types to model your domain</a>. I would like to advocate in favor of domain objects.
+</p>
+<h2>Abstraction</h2>
+<p>
+When coding we should always aim at creating domain specific language based on the software use cases (aka domain). </br>
+This is called abstraction. Do not confuse abstraction with indirection. Abstraction is process of hiding complexity and providing tightly targeted objects (functions). Indirection on the other hand is a way to achieve low coupling of components. Those two terms are often tangled together, usually loosing benefits of both in the process. In java/spring world word domain object often refers to ORM entities in <a href="./2017-02-24-anemic_model.html">anemic architecture</a>. This is obviously not correct since entities represent structure of the database not your business models and use cases.  
+</p>
+<h2>Domain objects</h2>
+<p>
+What are domain objects? They are small objects describing your business. An example from finance software would be classes <span class="inline-code">InteresetRate</span>, <span class="inline-code">LoanAmount</span>, <span class="inline-code">Anuity</span>, <span class="inline-code">DaysPastDue</span>, etc. This seems like a boilerplate code since we can represent these concepts by a language primitives like <span class="inline-code">double</span>, <span class="inline-code">int</span>, <span class="inline-code">BigDecimal</span> and others. I would like to explain how using non-primitive objects even for the simplest concepts is beneficial.
+</p>
+<img src="https://i.redd.it/rj8raf1riyny.png" width="600px" />
+
+<h2>Maintainability</h2>
+<p>
+Most of our programming time is <a href="https://blogs.msdn.microsoft.com/oldnewthing/20070406-00/?p=27343/">spent in already existing code</a>. We have to fix bugs, change behavior or just reuse older code in new components. 
+</p>
+
+
+<blockquote>
+Most common anti-pattern among Developers: making choices based on speed of initial development rather than ease of debugging.
+<a href="https://twitter.com/mikeal/status/878380425529393152"> — Mikeal Rogers (@mikeal) [24 Jun 2017]</a>
+</blockquote>
+<p>
+By spending a bit more time using domain object instead of a primitive will save you many times more in the future.
+</p>
+<h2>Code readability</h2>
+<p>
+Naming variables <a href="https://martinfowler.com/bliki/TwoHardThings.html">is hard</a>. If you do not use domain object you feel the tendency to use the object name as variable name or at least to include it to the name. This is then repeated throughout the codebase again and again. Lets omit that and encode that name directly to the variable type!
+</p>
+<pre class="prettyprint lang-java">
+double offeredInterestRate ....;
+// vs 
+InterestRate offered = ...;
+</pre>
+<p>
+I would be even tempted to create <span class="inline-code">OfferedInterestRate</span> in this case :)
+Ok, shorter variable names are not a big deal. But whole method using domain concepts instead of primitives, that is something! Such code could be read by non-programmers too. Try describing <span class="inline-code">double</span> and <span class="inline-code">InterestRate</span> to your business team, which one will be easier?
+</p>
+<h2>Apples and oranges</h2>
+<p>
+This is the most important consequence of using domain objects in typed systems.
+Imagine a simple method <span class="inline-code">double calcualteInterest(...);</span> Does it return a percents in <span class="inline-code">4.99 %</span> or <span class="inline-code">0.0499</span> form? We can only hope that the author of the code included that in the javadoc of that method. Even if he did, you have to remember that every time when you call it and that it will not change unexpectedly in newer versions. </br>
+Use a domain object instead and encapsulate that fact inside that object <span class="inline-code">InterestRate calcualteInterest(...);</span>. Now I don't care which form it does have. And there is more!
+</p>
+<pre class="prettyprint lang-java">
+// consider a method signature
+double calcualteInterest(double amount, double annuity);
+// and its usage
+double amount = ...;
+double anuity = ...; 
+double interest = calcualteInterest(annuity, amount);
+</pre>
+<p>
+Can you spot a bug? Of course you do, its three lines of code! But can you spot that in a large codebase and long pull requests? I know a guy who can spot such bugs with ease. It's in fact his job! He is called type system and together with a compiler he will yell at you every time you make such a mistake. He has one condition though: you have to use types for your domain. 
+</p>
+
+<h2>Valid states</h2>
+<p>
+Lets take the same method as in previous example <span class="inline-code">calcualteInterest(double amount, double annuity)</span> again. Is negative amount a valid loan amount or even negative annuity? This method looks like they are because it will accept them as parameters. We do not have <a href="https://en.wikipedia.org/wiki/Dependent_type">Dependent types</a> in java and I think we wont have them for a very long time so we should explain our constraints with ... surprise ... domain objects. Objects maintain their own always valid state (OOP lesson number one). Is complete work of Shakespeare a valid email address? No, it is not, so why you have a <span class="inline-code">String email;</span> Represent your domain with always-valid objects and you can get rid off validity checks that spread across all your code base. Another point for better maintenance!
+</p>
+<h2>Documentation</h2>
+<p>
+You cannot put javadoc on top of primitive objects and library classes but you can do that for your domain objects! Thank you captain obvious, right? :) This is such a trifle, but it makes a huge difference. When I see <span class="inline-code">int daysPastDue = ...;</span> what does it mean? I have to search some internal wiki or ask someone. Instead I could just navigate to that class and read 
+</p>
+
+<pre class="prettyprint lang-java">
+/**
+ * Represents number of days that user is due with a payment with an annuity. It is calculated as ....
+ * Other very useful info.
+ * Domain objects rulez!
+ */
+public class DaysPastDue { ... }
+</pre>
+<br />
+
+<h2>Tests</h2>
+<a href="./2017-03-06-tdd-intro.html">I mentioned before</a> that when TDDing you should not invent the implementation in the test. How can you achieve that without encapsulating the domain in domain objects? By using a <span class="inline-code">BigDecimal</span> in a test you are forcing yourself to use that type in your code and thus tieing your test tightly to an implementation.
+
+<h2>Refactoring</h2>
+Find usage feature now becomes very usefull since you can actualy search where an InterestRate is used. Searching by variable names, such as `double interestRate`, might not be that successful since it depends on well named variables without typos.
+
+<h2>Performance</h2>
+Are you worried about performance of a code that uses custom objects over primitives? Yes it might cause some problems in software in which you are saving milliseconds. That is not the case for most apps. And there is even a chance that your code will perform better. With well structured and designed code, <a href="https://wiki.openjdk.java.net/display/HotSpot/PerformanceTechniques">JVM can perform better analysis</a> which in turn boosts your performance. And remember to benchmark carefully with <a href="http://openjdk.java.net/projects/code-tools/jmh/">JMH</a>.
+
+
+<br />
+<p>Not everything needs to be a domain object but the more the better.</p>
+
+
+<h3>Further reading </h3>
+<ul>
+<li><a href="https://martinfowler.com/tags/domain%20driven%20design.html">Domain Driven Design</a></li>
+<li><a href="http://wiki.c2.com/?PrimitiveObsession">Primitive obsession</a></li>
+<li><a href="http://www.yegor256.com/2014/12/01/orm-offensive-anti-pattern.html">ORM Is an Offensive Anti-Pattern</a></li>
+</ul>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>

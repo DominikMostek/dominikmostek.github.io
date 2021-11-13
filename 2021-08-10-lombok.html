@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+    
+  </head>
+  <body>
+    <div class="center">
+        <a href="./index.html">Back to homepage</a>
+        <h1>Why Lombok is hurting your code</h1>
+        <p><i>Posted on August 10, 2021</i></p>
+
+<p>
+Lombok lets you do wrong things very easily. And that is a huge problem. Using it cripples your thinking about code and its architecture.
+</p>
+<p>
+The title of this post is very sharply phrased I know. And I would like to point out two things before I start.
+<ul>
+<li>Anything I say about Lombok is not aimed at Lombok as a project but rather on foundation ideas and the consequences of using it.</li>
+<li>Using Lombok or not is a no recipe for a good code and product. You can create an astonishingly good code while using Lombok and of course a very bad one without it.</li>
+</ul>
+</p>
+<p>
+The point I would like to make is that using Lombok is robbing you and your code of the benefits of well-designed code. It does it by telling you that some parts of code suck and they will always suck and there is no other way so we created a library to hide those parts out of your sight. 
+</p>
+<p>
+Here is a <a href="https://projectlombok.org/features/all">complete feature list</a> but I would like to stop at only some of them which are the worst in my opinion. 
+</p>
+
+<h2>Constructors</h2>
+<p>
+Constructors are one of the most important aspects of a class. It is a place that defines how your class fits with other classes. As in a quote 
+"As many languages you know, as many times you are a human being" for classes it is "As many constructors class have, as many times it can be reused". 
+A propper class has multiple constructors in order to be usable in as many contexts as possible. 
+If your constructors just copy your fields list your problem is not "I have to write a boilerplate constructor that just copies a parameter list". The real problem here is having a class that is not reusable and that is something that Lombok won't help you with. 
+</p>
+<h2>Builders</h2>
+<p>
+Builder pattern, as useful as it seems, is in most cases antipattern. Having a class with many fields is a code smell that should raise a red flag in order to make the class more composable. Of course, there are rare cases in which builders are acceptable, but they are rare, and one-time code generation in your favorite IDE is enough. 
+Large field lists are a composition problem. Do not cover the problem under the Lombok blanket, solve the composition problem! 
+</p>
+<h2>Getters/Setters</h2>
+<p>
+My favorite argument about Lombok is about getters and setters. 
+I am often confronted with the argument that getters are boilerplate code and Lombok really helps. If you have getters and setters then sure it is. I don't face this problem so I don't need to generate them at all. I don't have getters and setters in my code. They are not needed in almost all cases. They are very hurtful to the code architecture. 
+</p>
+<p>
+In some rare cases of pure data transporter classes simple <span class="inline-code">public final</span> filed will do much better. "But I will lose the encapsulation!!". No, you won't, you can't lose something that was not there in the first place. Getters and setters actually break encapsulation in most cases.
+Improve your design so you dont need getters and you wont feel any need generating them.
+</p>
+<h2>NonNull</h2>
+<p>
+Having nulls in your code (not counting inputs) is a bad idea to begin with. Do not return nulls anywhere and you won't need to check for it. Return lists, null objects, throw exceptions, do anything except returning null unless there is absolutely no other way. If you don't have nulls you don't have to generate null checks. 
+</p>
+
+<h2>Build time</h2>
+<p>
+Recently a colleague of mine discovered a big difference in a build time when using a <span class="inline-code">val</span> feature. Using it is accountable for a 63 % increase in the compilation time of our project. In our case, it is just 2 minutes. But 2 minutes times number of devs times compilations per day times working days in a year and you are at on man-year of work lost. 
+</p>
+<p>
+There are some harmless or even great features of Lombok of course. <span class="inline-code">@SneakyThrows</span> might be one of them. But those little beneficial features never pay off the technical debt introduced by ignoring the code architecture with other features.
+</p>
+<p>
+Even a <span class="inline-code">Log</span> feature that seems harmless might not be. It sends a signal to a dev that having a statically generated logger (not injected through the constructor) is normal and a good thing. We are used to it in the Java world but I would not take it for granted. See <a href="./2017-06-19-logger-unit-testing.html">my post about injecting a log</a>. 
+</p>
+<p>
+Lombok takes away the reasoning about the code architecture and normalizes things that should be questioned and reasoned about. 
+</p>
+<p>
+<b>Reject the temptation of an easy solution. Take the hard path - improving the code architecture</b><br />
+Taking the hard path may be slow from the begging but pays off greatly in a long run.
+</p>
+
+<ul>
+<li><a href="https://www.amazon.com/Object-Thinking-Developer-Reference-David/dp/0735619654">Object thinking</a>
+<li><a href="https://martinfowler.com/bliki/TellDontAsk.html">Tell-Don't-Ask</a>
+<li><a href="https://www.yegor256.com/elegant-objects.html">Elegant objects</a>
+<li><a href="https://martinfowler.com/eaaCatalog/specialCase.html">Null object aka Special Case</a>
+<li><a href="https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/">Null References: The Billion Dollar Mistake</a>
+<li><a href="https://marcus-biel.com/getters-and-setters-are-evil/">Getters and setters are evil</a>
+</ul>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>

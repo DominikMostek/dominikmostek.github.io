@@ -1,61 +1,43 @@
----
-layout: page
-subtitle: Dominik Moštěk - Software development blog
----
-
-<div class="posts-list">
-  {% for post in paginator.posts %}
-  <article class="post-preview">
-    <a href="{{ post.url | prepend: site.baseurl }}">
-	  <h2 class="post-title">{{ post.title }}</h2>
-
-	  {% if post.subtitle %}
-	  <h3 class="post-subtitle">
-	    {{ post.subtitle }}
-	  </h3>
-	  {% endif %}
-    </a>
-
-    <p class="post-meta">
-      Posted on {{ post.date | date: "%B %-d, %Y" }}
-    </p>
-
-    <div class="post-entry">
-      {{ post.excerpt | strip_html | xml_escape | truncatewords: site.excerpt_length }}
-      {% assign excerpt_word_count = post.excerpt | number_of_words %}
-      {% if post.content != post.excerpt or excerpt_word_count > site.excerpt_length %}
-        <a href="{{ post.url | prepend: site.baseurl }}" class="post-read-more">[Read&nbsp;More]</a>
-      {% endif %}
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+  </head>
+  <body>
+    <div class="center">
+      <h1>Dominik Moštěk - Blog</h1>
+      <b>You can contact me at:</b> <a href="https://www.linkedin.com/in/dominikmostek/">LinkedIn</a>, <a href="https://twitter.com/DominikMostek">Twitter</a> or send me an <a href="mailto:mostekdominik@gmail.com">email</a>
+      <div class="post-list">
+        <h2>Posts</h2>
+        <ul>
+          <li>2021-11-12 - <a href="./2021-11-12-tdd-does-not-work.html">Why TDD does not work</a></li>
+          <li>2021-11-12 - <a href="./2021-11-12-oop.html">Object oriented programming talk</a>
+          <li>2021-08-12 - <a href="./2021-08-12-interface-inheritance.html">Alternative to interface inheritance</a>
+          <li>2021-08-10 - <a href="./2021-08-10-lombok.html">Why Lombok is hurting your code</a>
+          <li>2019-10-18 - <a href="./2019-10-18-mocking.html">Your mock is a joke</a>
+          <li>2019-03-28 - <a href="./2019-03-28-tests-no-way-from-misery.html">Tests are not a way out of misery</a>
+          <li>2018-03-06 - <a href="./2018-03-06-layers-of-hell.html">Layers of hell</a>
+          <li>2017-12-05 - <a href="./2017-12-05-on-interface.html">Interface all the things</a>
+          <li>2017-07-30 - <a href="./2017-07-30-16-use-domain-types.html">Domain types rocks!</a>
+          <li>2017-04-08 - <a href="./2017-04-08-spring-interfaces.html">Spring proxies, interfaces and final methods</a>
+          <li>2017-03-06 - <a href="./2017-03-06-tdd-intro.html">Tips for TDD and unit tests</a>
+          <li>2017-02-24 - <a href="./2017-02-24-anemic_model.html">Anemic philippic</a>
+          <li>2017-02-12 - <a href="./2017-02-12-class-value.html">Classes as Map keys in Java</a>
+          <li>2017-02-07 - <a href="./2017-02-07-autowiring-hell.html">Dependency Misinjection</a>
+        </ul>
+      </div>
     </div>
-
-    {% if post.tags.size > 0 %}
-    <div class="blog-tags">
-      Tags:
-      {% if site.link-tags %}
-      {% for tag in post.tags %}
-      <a href="{{ site.baseurl }}/tag/{{ tag }}">{{ tag }}</a>
-      {% endfor %}
-      {% else %}
-        {{ post.tags | join: ", " }}
-      {% endif %}
-    </div>
-    {% endif %}
-
-   </article>
-  {% endfor %}
-</div>
-
-{% if paginator.total_pages > 1 %}
-<ul class="pager main-pager">
-  {% if paginator.previous_page %}
-  <li class="previous">
-    <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}">&larr; Newer Posts</a>
-  </li>
-  {% endif %}
-  {% if paginator.next_page %}
-  <li class="next">
-    <a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}">Older Posts &rarr;</a>
-  </li>
-  {% endif %}
-</ul>
-{% endif %}
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>

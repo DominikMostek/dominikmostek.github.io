@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+    
+  </head>
+  <body>
+    <div class="center">
+        <a href="./index.html">Tips for TDD and unit tests</a>
+        <h1></h1>
+        <p><i>Posted on March 6, 2017</i></p>
+<p>
+Test driven development is something so elementary for me I can't imagine writing a code without at least some TDD. Learning TDD was very eye opening for me in many ways. Since then I try to help others "open the eyes". Once I was asked to do a brief intro to a big team of developers so I am sharing it online so in future I can just link this post. 
+</p>
+<h2>T for Testing</h2>
+<p>
+T in TDD stands for test. So you write tests. To be exact <b>unit tests</b>. But I must mention that TDD is not just about covering your code with verification of business correctness. It is about the design that will emerge from the specifics of this developement process. This is why it must be unit test, not end to end test, big integration tests or <a href="https://docs.spring.io/spring/docs/current/spring-framework-reference/html/integration-testing.html">spring context tests</a>.
+</p>
+
+<h2>D for Driven</h2>
+<p>
+If test should drive our code implementation we have to write our tests before our implementation. This is well known image which describe process of TDD. 
+<center><img src="http://singlepageappbook.com/assets/tdd.png" alt="TDD Loop" style="width: 500px;"/></center>
+</p>
+<p>
+You work in short iterations and repeat these steps over and over - Write a failing test. Make it pass quickly. Refactor the solution. 
+</p>
+<p>
+I wont go into details here. The best is to read Kent Becks book <a href="https://www.amazon.com/Test-Driven-Development-Kent-Beck/dp/0321146530">Test Driven Development: By Example</a>. What I want to do is give a set of tips how to write good tests that will drive your work and code in the right direction.
+</p>
+<h2>Listen to your tests</h2>
+<p>
+This is most important of all. Listen what test is telling you. If it is painful to write a setup code, you have to mock a lot, or you even have to use some workarounds to write the test&nbsp;-&nbsp;the test is telling you that there must be different way how to write the code, better one. 
+</p>
+<pre class="prettyprint lang-java">
+// don’t do this
+DateTimeUtils.setCurrentMillisFixed(millis);
+// or this
+ReflectionUtils.setField(service, "fieldName", fieldValue);
+</pre>
+<p>
+Sometimes I see making some methods protected to be reachable from the unit test. This happens usually when setup for calling the public method is so complicated that it is untestable and author instead of listening decided to fight the test. 
+</p>
+<h2>Naming, naming, naming</h2>
+<p>
+When I try to understand some code I look at tests. I try to read test names in order to see what the code does. This can be true only when test names are meaningful.</br>
+Consider this standard names of test for a class <span class="inline-code">Calculator</span>
+</p>
+<pre class="prettyprint lang-java">
+void testAdd() {...}
+void testCalculation() {...}
+void throwsException() {...}
+void testRemove() {...}
+</pre>
+<p>
+and now guess what the code does? Does <span class="inline-code">add</span> operation takes two arguments? Does it take negative values? The exception is thrown under which conditions? 
+Now look at these names. Taken from real code. 
+</p>
+<pre class="prettyprint lang-java">
+void variablesInInputStringAreReplacedByTheirValues() {...}
+void exceptionIsThrownWhenVariableIsNotFound() {...}
+void variableCanBeOverwritenInChildContext() {...}
+void parametersCannotBeOverwritenInChildContext() {...}
+void builderThrowExceptionWhenRegisteringVariableWithSameNameAsParameter() {...}
+// ... etc
+</pre>
+<p>
+I think you can make at least some picture of the code and what it does. This style of naming has other advantages as well. If you don't know how to name it you don't understand the problem you are trying to solve. Also when the test fails later on you can tell exactly what is wrong with the code. If <span class="inline-code">variablesInInputStringAreReplacedByTheirValues</span> fails you can be sure that variables are not replaced.
+Prefixes such as <span class="inline-code">test</span>, <span class="inline-code">should</span>, <span class="inline-code">verify</span> are boilerplate, get rid of them. If you prefix each test method with the same prefix what is the point of it then? Just state a fact about the code. The fact is then proved simple by running a test. 
+As you can tell from the example test names - there is no one-to-one relationship with test methods and production code methods. We are not testing methods, we are testing features of the code. Same applies for test class names. It does not have to be one class, one test. 
+</p>
+<h2>No logic in tests</h2>
+<p>
+Test should be very simple. It should follow three blocks - Arrange, Act, Assert. With least possible lines per block. If you write some logic in your test how it will be tested? Avoid even things like string concatenation. There is a good example in <a href="http://googletesting.blogspot.de/2014/07/testing-on-toilet-dont-put-logic-in.html">this post from google</a> why not. Can you spot an error in this code?
+</p>
+<pre class="prettyprint lang-java">
+@Test 
+public void shouldNavigateToPhotosPage() {
+  String baseUrl = "http://plus.google.com/";
+  Navigator nav = new Navigator(baseUrl);
+  nav.goToPhotosPage();
+  assertEquals(baseUrl + "/u/0/photos", nav.getCurrentUrl());
+}
+</pre>
+<p>
+It will pass for url <span class="inline-code">http://plus.google.com//u/0/photos</span> (double slash). 
+</p>
+<p>
+Apart from this it is so much more readable to have the result written as is in the assert part because you can quickly know what the code returns without reading some other lines. Consider this example
+</p>
+<pre class="prettyprint lang-java">
+assertThat(value).isEqualTo(object.getValue() * 2 * MINUTES);
+// vs.
+assertThat(value).isEqualTo(2_500);
+</pre>
+
+<h2>Single responsibility </h2>
+<p>
+You are sticking to <a href="https://drive.google.com/file/d/0ByOwmqah_nuGNHEtcU5OekdDMkk/view">SRP</a> in your code, aren't you? Apply it also on tests. In test this means that each test have only one reason to fail. As mentioned before <span class="inline-code">variablesInInputStringAreReplacedByTheirValues</span> can fail only when variables cannot be replaced. This is often interpreted as rule of single assert. 
+</p>
+<pre class="prettyprint lang-java">
+void moreAssert() {
+  assertThat(price.getTax()).isEqualTo(456);
+  assertThat(price.getVipDiscount()).isTrue();
+}
+</pre>
+<p>
+This test will fail either if our tax calculations or our vip status detection is not correct. If you follow tip for naming the tests and listeneing them this should be obvious even before writing the asserts. Because how do you name it - <span class="inline-code">taxIsCalculatedAsPercentageAndVipStatusIsDetected</span>? That does not sounds right to me. </br>
+But do not follow the single assert rule too strictly. Often it is completely ok to have more asserts, but they all have to verify single aspect of the feature. But be aware that when using JUnit the first assert will cause the test method to fail and not execute the rest of the asserts! 
+</p>
+<h2>Start with an assert</h2>
+<p>
+How do you validate that your method does what it should do? That is maybe the hardest part of writing the test. Following the life-pro-tip rule <a href="https://blog.bufferapp.com/the-habits-of-successful-people-they-do-the-painful-things-first">of starting with the hardest thing</a> - start with an assert. When you have an assert create the missing variable. Then fill the variable from some code that you are testing. Now create missing parameters and you have a complete test.
+</p>
+<h2>Use custom exceptions</h2>
+<p>
+This is not TDD specific tip but I have to mention it. When testing code for exceptions throw custom exceptions from code. Otherwise it wont be testable. 
+</p>
+<pre class="prettyprint lang-java">
+@Test(expected = IllegalArgumentException.class)
+void someTest() {...}
+</pre>
+<p>
+This test will fail even if you are not the one throwing an exception. It might be some framework you are using and you actually have a bug in the code, but the test passes. This rule apply only for business code, use standard exceptions otherwise. When writing file reading code it is far better to throw standard java exceptions than custom one.
+</p>
+<h2>Write fast tests</h2>
+<p>
+You should run your tests very often. If you test takes a long time to execute you will have tendency to open hackernews or do some other distractive activity that will ruin your TDD cycle.  
+<center><img src="./img/test-book.jpg" alt="" style="width: 500px;"/></center>
+</p>
+<h2>Master your tools</h2>
+<p>
+As I mentioned in the intro. Writing test-code-refactor way is an iterative process. When doing same things again and again it is important to get rid as much litter activities as possible. Learn your IDE shortcuts, learn how to execute tests with single command or a key press.  
+</p>
+<h2>Isolate your test</h2>
+<p>
+Every of your test should be able to run anytime, offline, without any additional setup. They should be executable in any order, all at once or just single test. All inputs should be clear from the test and relationship to the output should be clear. 
+</p>
+<h2>Don't think about the <a href="https://en.wikipedia.org/wiki/Elephant_in_the_room">elephant</a></h2>
+<p>
+When writing the test don't think about the solution. Write the test code as clean and descriptive as possible. Design object to copy your business not your technical solution. Do you handle money? Use <span class="inline-code">Money</span> object, not <span class="inline-code">BigDecimal</span> or any else. It will represent your intentions better and will not tie you with single solution.
+</p>
+<h2>Do not use mocks too much</h2>
+<p>
+<a href="http://www.markhneedham.com/blog/2009/12/13/tdd-only-mock-types-you-own/?utm_source=feedburner&utm_medium=feed&utm_campaign=Feed%3A+MarkNeedham+%28Mark+Needham%29">Mock only types you own</a> and mock only when needed. Do not mock by default. Try to use real implementation instead. What you have to usually mock is objects at the boundaries of your system. I/O for example. Instead of using java file api directly use a custom <span class="inline-code">FileReader</span>. This <span class="inline-code">FileReader</span> can implement some <span class="inline-code">DataReader</span> interface and you can have simple readers for test purposes only. 
+</p>
+<pre class="prettyprint lang-java">
+void dataAreStoredInMap() {
+  DataReader reader = new DummyReader("key1,value1", "key2,value2");
+  processor.process(reader);
+  // ...
+}
+</pre>
+<p>
+This is definitively better then mocking a file system access. This approach will push the "dirty things" out of your core code which will make it more testable. Then you will end up with code that is free of file/database access or network communication, because those are things that <a href="http://blog.cleancoder.com/uncle-bob/2016/01/04/ALittleArchitecture.html">does not matter in the business code</a>. Your code will then be lot more composable and will most likely not violate SRP.
+</p>
+<h2>Java is not the king</h2>
+<p>
+In Java even simple List declaration and initialization is for several lines. But hey we have JVM we don't have to restrict ourselves to Java. Look for example on groovy. 
+</p>
+<pre class="prettyprint lang-java">
+@Test
+void "string as a method name, wow"() {
+  def list = [1, 2, 3]
+  def namedParams = new Complex(name: "John")
+  def mock = [ "get" : { -> "John"}] as NameSource
+  assert mock.get() != "John"
+}
+</pre>
+<p>
+This will improve readability and joy of writing the test by a magnitude. Then there are frameworks such as <a href="http://spockframework.org/spock/docs/1.1-rc-3/getting_started.html">Spock</a>.
+You can also use <a href="https://github.com/JetBrains/kotlin/blob/master/libraries/stdlib/samples/test/samples/collections/collections.kt">Kotlin</a>, Scala or any other JVM language.
+</p>
+
+<h2>Reading list</h2>
+<ul>
+<li><a href="https://www.amazon.com/Test-Driven-Development-Kent-Beck/dp/0321146530">Test Driven Development: By Example</a></li>
+<li><a href="http://www.growing-object-oriented-software.com">Growing Object-Oriented Software Guided by Tests </a></li>
+<li><a href="https://www.amazon.com/Working-Effectively-Legacy-Michael-Feathers/dp/0131177052">Working Effectively with Legacy Code</a></li>
+<li><a href="https://leanpub.com/4rulesofsimpledesignUnderstanding the Four Rules of Simple Design">Understanding the Four Rules of Simple Design</a></li>
+</ul>
+<h2>Links</h2>
+<ul>
+<li><a href="http://blog.cleancoder.com/uncle-bob/2017/03/03/TDD-Harms-Architecture.html">TDD Harms Architecture</a></li>
+<li><a href="http://blog.cleancoder.com/uncle-bob/2016/11/10/TDD-Doesnt-work.html">TDD Doesn't Work</a></li>
+<li><a href="http://blog.cleancoder.com/uncle-bob/2016/03/19/GivingUpOnTDD.html">Giving Up on TDD</a></li>
+<li><a href="http://ieftimov.com/tdd-humble-object">TDD Patterns: Humble Object</a></li>
+</ul>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>

@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+    
+  </head>
+  <body>
+    <div class="center">
+        <a href="./index.html">Back to homepage</a>
+        <h1>Interface all the things</h1>
+        <p><i>Posted on December 5, 2017</i></p>
+<p>
+Every code you write has its cost. It is in form of potential error, of time that is needed to read it, document it and change it. Every line of code needs to pay for its own cost and add some extra in order to be profitable. Is adding interfaces always profitable? 
+</p>
+
+<h2>Readability</h2>
+<p>
+Interface can indeed make your code well readable. It hides all the implementation details and forces you to relate only on its contract. But lets have a look on typical interface in [mainstream spring application](http://dominikmostek.cz/2017-02-24-anemic-philippic).
+</p>
+
+<pre class="prettyprint lang-java">
+public interface CaseService {
+    void touchCase(Case case);
+    long countCases(Specification<Case> specification);
+    Page<Case> getAvailableAllCases(String search, Specifications<Case> searchSpecifications, 
+      PageRequest pageRequest);
+    Case getCase(long id);
+    List<CaseFlag> getFlags(Long caseId);
+    void saveFlag(Long caseId, caseFlagType type);
+    List<Photo> getPhotos(long caseId);
+    Photo getPhoto(long photoId);
+    Photo savePhoto(Long caseId, String filename, String contentType, byte[] data);
+    boolean photoExists(Long caseId, Long photoId);
+    void saveAttachment(Long caseId, Attachment attachment);
+    Attachment getAttachment(long attachmentId);
+    void deleteAttachment(long caseId, long attachmentId);
+    void signCase(Long caseId, String agreementCode);
+    // 30 more
+}
+</pre>
+
+<p>
+Has creating this interface improved readability of your code? 
+</p>
+<p>
+<b>Note #1</b> if you can't design good class, interfaces won't help you. Always stick with <a href="http://wiki.c2.com/?InterfaceSegregationPrinciple">Interface Segregation Principle</a>.
+</p>
+<p>
+Designing interfaces such this one actually decreases readability for one simple reason. _Ok there are more than one, but one most obvious_. <br/>How do you call class that implements it? It should be something specific about the way how it is implemented. For example <span class="inline-code">class HttpResource implements Resource</span>. But what can be specific about implementation of <span class="inline-code">CaseService</span>? Perhaps <span class="inline-code">class IdontKnowWhatIAmDoingCaseService</span>. 
+</p>
+<p><b>Note #2</b> if you can't think of what is specific about your implementation maybe the interface is not designed well.</p>
+
+<h2>Testability</h2>
+<p>
+Previous interface dost not improve testability either. How do you write stub implementation of this monster? It is close to impossible. What you will end up with is mocking the interface with mockito or some other framework and create very unreadable and flaky tests. 
+Not even mentioning that if there would be no interface, only the class, mocking would look the same. So this code has no real purpose. It is just 1:1 enumeration of public methods of some class. 
+</p>
+<p>
+<b>Ok everything you have written is obvious if you have 50 methods in interface. Your services should be smaller and all problem go away</b>
+</p>
+<p>
+Not really true. The size is problem, of course, but most importantly the problem is philosophy behind this kind of interfaces. The very first reason why they have been written, small or large. 
+</p>
+<h2>Premature abstraction</h2>
+<p>
+Do you automatically create interfaces? Why? I am sure all of you heard that premature optimization is <a href="http://wiki.c2.com/?PrematureOptimization">root of evil</a>. The idea is that making decisions without enough data leads to wrong decisions. Same applies for abstractions. Without enough experience with modeled domain you can't design good abstractions. This also applies for technical domain not only business domain. When you design your interfaces beforehand and later you find out that they are not very suitable, you have a lot of code to change. And it leads to hacks and tricks in order to fight wrong abstractions.
+</p>
+<p>
+<b>Note #3</b> resist the temptation of premature abstractions. Always create implementation first. Create more implementations first. Then abstractions will be much easier to spot and extract. 
+</p>
+
+<p><b>But what if</b> I need to write another implementation and there is no interface? Then create it! This is the time when interface will pay for its cost. Adding interface somewhere is easy. There is no reason to add it everywhere <i>"just in case"</i>. 
+</p>
+<p>
+<b>Note #4</b> when writing an interface, ask yourself. How this interface will pay for its cost. Will there be several implementations in the near future? Do I need to introduce new domain concept in my app? 
+</p>
+<h2>Cargo cults</h2>
+<p>
+It seems to me that in programming community there is a lot of [cargo cults](https://en.wikipedia.org/wiki/Cargo_cult). Making interfaces for everything is one of them. Programmers were taught that interface is good and now they don't even think about it and put it everywhere. But the context is the king here. Sometimes it brings you zero value, maybe even negative in form of extra code to maintain and wrong abstraction which will cause trouble in the future. 
+</p>
+<p>
+Same principles applies for every piece of your software. Does introducing a layer adds some value <b>in this particular</b> case? It might be true in some other case but that does not imply it for any other. 
+</p>
+<ul>
+<li>Do not enforce interfaces/layers/... where they do not serve any real value. 
+<li>Design interfaces with enough knowledge about the problem
+<li>Design small interfaces
+<li>Practice TDD without mocking frameworks
+<li>Always name implementations about its specifics. 
+<li>Make decisions in context not because of cargo cults
+</ul>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>

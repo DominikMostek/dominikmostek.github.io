@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+    
+  </head>
+  <body>
+    <div class="center">
+        <a href="./index.html">Back to homepage</a>
+        <h1>Your mock is a joke</h1>
+        <p><i>Posted on October 18, 2019</i></p>
+<p>
+When writing tests I am trying to avoid mock frameworks at any cost. Here is why
+</p>
+
+<blockquote>
+Your mock object is a joke; that object is mocking you. For needing it.
+<a href="https://twitter.com/richhickey">~ Rich Hickey</a>
+</blockquote>
+
+<h2>It is not compile safe</h2>
+<p>
+This code is perfectly compilable, but it will fail at runtime.
+</p>
+<pre class="prettyprint lang-java">
+@Test
+public void bar() {
+    ITest mock = mock(ITest.class);
+    doReturn(new BigDecimal(5)).when(mock).foo(1);
+
+    mock.foo(1L);
+}
+
+
+interface ITest {
+    String foo(Number x);
+}
+</pre>
+<p>
+We should take advantage of compiler whenever possible. Not bypass it. This would not happen with anonymous class or a lambda.
+</p>
+
+<p>
+<b>Make wrong use hard or even impossible</b>
+</p>
+
+<h2>So easy to break contract</h2>
+<p>
+When defining a mock I can violate method contract very easily. 
+</p>
+<pre class="prettyprint lang-java">
+@Test
+public void bar() {
+    Geometry mock = mock(Geometry.class);
+    doReturn(12.3).when(mock).tan(pi/2);
+}
+
+interface Geometry {
+
+  /**
+   * Must return null when x = pi/2
+   **/
+    Double tan(double x);
+}
+</pre>
+<p>
+I have violated the contract defined in the javadoc. I know, if it is not compile-time safe its never guaranteed, so how not using mockito helps? </br>For example by using dummy implementation. When implementing an interface you obviosly tend to read its doc. You should do that in case of mockito object also but who does that, right? And the dummy implementation has two more advantages - once implemented according the javadoc it will adhere to its contract whenever used. And it can be unit tested for it. So even if Josh read the javadoc and created the mockito object correctly, Charles might not. If Charles reused the dumy implementation the concern of adhering to the contract is alread solved.
+</p>
+
+<h2>Using mock framework hide code smells</h2>
+<p>
+I think you should feel the pain of every bad design decision you have made.
+Consider an interface with a lot of methods violating SRP. 
+</p>
+<p>
+If you use mock frameowrk it ill hide the pain and you wont feel it and have the urge to fix it.
+</p>
+<pre class="prettyprint lang-java">
+HugeIface mock = mock(HugeIface.class);
+doReturn(5).when(mock).fooBar();
+</pre>
+<p>
+This is very easy and comfortable, right? The bad design is still there but it is not that obvious. If you use anonymous class, for example the poor design choice will come to a sunlight.
+</p>
+<p>
+You have a lot of code you dont need and most methods contains no code or just <span class="inline-code">return null</span>. Thus possible violation of <a href="https://en.wikipedia.org/wiki/Single_responsibility_principle">SRP</a> or/and <a href="https://en.wikipedia.org/wiki/Interface_segregation_principle">ISP</a>. This is btw the same reason why I do not like project Lombok. It hides the wrong things.
+</p>
+<p><b>Make the bad decision visible.</b></p>
+
+<h2>Your code should be !easily! testable without any framework</h2>
+<blockquote>
+The use cases are at the center. Always! Databases and frameworks are details
+<a href="https://blog.cleancoder.com/uncle-bob/2012/05/15/NODB.html">~Robert C. Martin, No DB</a>
+</blockquote>
+<p>
+If you need a framework to test your use cases there is somethig wrong. Some technical details are obviously leaking into your use cases.</br>
+That is the case with <span class="inline-code">@InjectMocks</span> annotation. 
+</p>
+
+
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>

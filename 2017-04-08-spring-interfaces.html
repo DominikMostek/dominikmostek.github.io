@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+    
+  </head>
+  <body>
+    <div class="center">
+        <a href="./index.html">Back to homepage</a>
+        <h1>Spring proxies, interfaces and final methods</h1>
+        <p><i>Posted on April 8, 2017</i></p>
+
+<p>
+Bean loading and proxying is topic so basic that I am almost ashamed that it took me so long to solve the problem caused by a simple spring mechanism.
+Simple bean with one dependency was throwing NullPointerException when using this dependency event if it was injected correctly. How is it possible?
+</p>
+<h2>Beans with an interface</h2>
+<p>
+The purpose of interface is clear. It decouples callers from specific implementations. But it is no surprise that in spring world there is something more.
+When declaring component in spring with some additional features using annotations
+</p>
+
+<pre class="prettyprint lang-java">
+@Component
+@Cacheable(/* caching configuration */)
+public class UserServiceImpl implements UserService { ... }
+</pre>
+<p>
+spring will wrap your class in proxy that will do the job, in this example caching the return values. This proxy will implement same interface as the target class.  </br>
+This is the reason why this code
+</p>
+<pre class="prettyprint lang-java">
+System.out.println(context.getBean(UserService.class).getClass());
+</pre>
+<p>
+outputs <span class="inline-code">class com.sun.proxy.$Proxy20</span> not a <span class="inline-code">UserService</span>. Now what output will this code yield?
+</p>
+<pre class="prettyprint lang-java">
+System.out.println(context.getBean(UserServiceImpl.class).getClass());
+</pre>
+</p>
+<p>
+Correct answer is none. It will fail due to exception
+</p>
+<pre class="prettyprint">
+NoSuchBeanDefinitionException: No qualifying bean of type 'UserServiceImpl' available
+</pre>
+<p>
+How is this possible when the bean clearly exist in the context? It sure exists, but it is the proxy of type <span class="inline-code">UserService</span> not a <span class="inline-code">UserServiceImpl</span>. 
+This proxy is a standard <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Proxy.html">JDK Proxy</a>. This proxy can be used only for interfaces not concrete classes. 
+</p>
+<p>
+This can be solved by using another proxy implementation. Annotate the component with
+</p>
+<pre class="prettyprint lang-java">
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
+</pre>
+<p>
+And spring will use <a href="https://github.com/cglib/cglib/wiki/Tutorial">CglibAopProxy</a> instead JDK Proxy. Now the previous code snippet outputs.
+</p>
+<pre class="prettyprint lang-java">
+class UserServiceImpl$$EnhancerBySpringCGLIB$$82ee3d31
+</pre>
+<p>
+If your component declares no interfaces spring will automatically use cglib proxy.
+</p>
+<h2>Final methods</h2>
+<p>
+Usage cglib proxy has another consequence. It can't proxy final methods! </br>
+Consider this simple example
+</p>
+<pre class="prettyprint lang-java">
+@Component
+public class MyComponent {
+
+    private final Dependency dependency;
+
+    public MyComponent(final Dependency dependency) {
+        this.dependency = dependency;
+    }
+
+    public final void doSomethingFinal(int key) {
+        dependency.getNumber();
+    }
+}
+</pre>
+<p>
+There is nothing wrong with this code and it will execute fine. But now somebody adds caching to it. 
+</p>
+<pre class="prettyprint lang-java">
+@Cacheable(value = "test", key = "#key")
+public final void doSomethingFinal(int key) { ...
+</pre>
+<p>
+And now it fails because of <span class="inline-code">NullPointerException</span>. The reason is that spring will inject the bean to the instance of cglib proxy. But the call to <span class="inline-code">doSomethingFinal</span> method is not proxied but invoked directly. 
+</p>
+<p>
+Spring developers are trying to help you catch that problem early by logging it 
+</p>
+<pre class="prettyprint">
+INFO: Unable to proxy method [public final void MyComponent.doSomethingFinal(int)]
+ because it is final: All calls to this method via a proxy 
+ will NOT be routed to the target instance.
+</pre>
+<p>
+But when starting spring application this can easily go unnoticed. 
+</p>
+<p>
+<b>What about final classes?</b>  In this case you are all covered because cglib will fail even to instantiate the class with an exception
+</p>
+<pre class="prettyprint">
+Could not generate CGLIB subclass of class [class MyComponent]: 
+Common causes of this problem include using a final class or a non-visible class
+</pre>
+
+
+
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>
