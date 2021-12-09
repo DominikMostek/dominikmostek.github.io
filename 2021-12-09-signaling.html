@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+    
+  </head>
+  <body>
+    <div class="center">
+        <a href="./index.html">Back to homepage</a>
+        <h1>Signaling in programming</h1>
+        <p><i>Posted on December 09, 2021</i></p>
+
+        <p>
+          Doing decisions is hard. In order to make good decision having good inputs is crucial. In economy we have <a href="https://en.wikipedia.org/wiki/Price_signal">price signaling</a>. Basicaly the higher the price is the more scarcer the product is. In order to do the right decision we have to do <a href="https://en.wikipedia.org/wiki/Cost%E2%80%93benefit_analysis">cost/benefit analysis</a> everytime we buy something. 
+        </p>
+        <p>
+          The problem arises when we remove the signal or we introduce a lot noise into the signal. Without the signal we can't have good output. This is on of the reasons why socialism is failing, it basicaly can't allocate the resources based on the prices. <br /><br />
+          But it's human nature to fight signals instead of reacting to them. <br/> <br/>
+        </p>
+        <p>
+          How is this relevant to software development? <br /><br />
+
+          There are signals all aroud our code. For example <a href="https://stackoverflow.com/questions/21105403/mocking-static-methods-with-mockito">having to mock static method</a>, <a href="https://projectlombok.org/features/GetterSetter">the need to generate getters and setters</a>, <a href="https://stackoverflow.com/questions/3458451/check-chains-of-get-calls-for-null">null chaining</a> and many, many, many more. 
+          <br />
+          They signal us that there is something wrong with our code if we run into them. <br /><br />
+
+          Unfortunately, humans do human stuff and instead of reacting to the signals the mainstream decided to remove them. We figured out how to mock basicaly anything, we invented lombok to generate the code, introduced optionals or null chaining operators. With those tools we pretend that the root of the problem is in the signal not in the actions that lead to the signal. And by ignoring those actions you will trap yourself in the dead end road of never ending technical debt. 
+          <br />
+          <br />
+          That is the reason I am so sceptical for example about Kotlin or Microservices. Kotlin is awesome language, dont'get me wrong. But the problem I see is Java programmers migrating to Kotlin because it's easier to work with nulls and having data classes. For me this is signal avoiding. Same with microservvices. It's a great architecture. But most of the times I have seen a transition from monolith to microservices it was because the monolith components were coupled and its parts were highly unmodular. You can try blame monolith for that as much as you want but the problem is not the monolith but the way you have build it. <br /> There are good reasons to use microservices, Kotlin, Lombok, Mocking and any other technology, but it must be other then fighting the problem signaling.
+        </p>
+    
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>
