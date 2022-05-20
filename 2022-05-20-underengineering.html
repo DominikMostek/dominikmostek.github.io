@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+    
+  </head>
+  <body>
+    <div class="center">
+        <a href="./index.html">Back to homepage</a>
+        <h1>Lets talk about underengineering</h1>
+        <p><i>Posted on May 20, 2022</i></p>
+
+        
+
+<p>
+Over-engineering, a problem we hear about quite often. But often do we hear about under-engineering? Have you ever heard someone use such term? Twelve years as a software engineer I have not. But I have heard term over-engineering a lot. Why we fear over-engineering so much but we are ok with not enough engineering?
+</p>
+
+<h2>What is engineering</h2>
+<blockquote>
+Engineering is the application of science and mathematics to solve problems.
+</blockquote>
+<p>
+Most often software engineering is seen as a process of creating software. In fact its a process of solving problems by software. It's subtle but important distinction. First definition is about writing code. The second one is about solving problem with code. 
+Why is that important? Because it forces some requirements on the outcome of our work. 
+What problems are we solving with code?
+Companies we work for deliver value to customer by selling a product, a software in this case. By writing this software we are solving the problem of a customer. We as software engineers often forget that this is not the only problem we solve. The other source of problems comes from the nature of how companies work.
+How do we beat our competition? Of course with innovation, ability to scale, delivering new features, etc. 
+
+Over-engineering thus means we are using inappropriate amount of code to solve problems. But are we considering all the problems? 
+</p>
+
+
+<h2>Predicting the future</h2>
+We all hope that our company will be the winner among all competitors right? With this in mind we need to focus not only on solving customers problem, but also on company's future. 
+We write software and software got its name from the fact that it's easy to change. As opposed to hardware that stays almost the same after its manufactured. 
+Change is the known-unknown of software development. We for sure know it will come but we don't know how ti will look like. 
+How do we prepare for it?
+
+<h2>Decision tree</h2>
+We can make three types of decisions. 
+
+<img src="img/tree.jpg" style="width: 60%; float:right;" />
+<h3>Leaf</h3> 
+<p>Leaf is easily replacable part of a tree. And such are leaf decision. Such decision is very easy to change in the future. As there are lot of leaves in a tree we are making a lot of such decisions. 
+</p>
+<h3>Branch</h3>
+<p>
+  We can replace branch of a tree. Its not easy but doable. It afffects the tree as a whole. Same way branch decisions are costly to change but manageble if needed. Tree can have many branches but not that many as leaves. 
+</p>
+<h3>Trunk</h3>
+<p>
+  A trunk is what makes tree a tree. It has one or a few and its imposible to replace it without killing the tree. In a decision word it means a decision that is almost non-revertable. 
+</p>
+
+The only way to prepare for the future is to reduce trunk and branch decisions. To make everything replacable.  
+<br />To turn branch decision into a leaf one we must engage some engineering practices. 
+And thats where our clash between under and over engineering comes into play. 
+<br />Under-engineering is not investing enough into engineering practices. 
+
+<div style="width: 100%; clear: both"></div>
+
+
+
+<h2>Opportunity cost</h2>
+
+Opportunity Cost = (returns on best Forgone Option) - (returns on Chosen Option)
+
+Forgone Option in our case is codebase that allows rapid changes and market reaction. 
+
+If we choose to under-engineer now we are of course saving money. The term saving is questionable because it depends how we use the saved cost. 
+
+Is solving immediate threats crucial for company's survival? Then under-engineering is a way to go. But at the cost of technical debt. In that case Chosen option equals to Forgone option. 
+
+
+In other cases the cost of not being able to scale and innovate will be unbearable. It's one of the reasons why many startups stop innovating after some time. Or why companies have so many programmers. What do they do all day? They are changing branches instead of leaves. 
+
+Good design is an investment. And as a good investor you have to diversify. At same places of your code you won't need any of the indirections you created. But in others it will allow you rapid changes. 
+
+<h2>Technical debt</h2>
+Isn't under-engineering just different word for technical debt? Depends on how you define it. I see it as synonyms. But would you consider this code as technical debt?
+
+(TODO example)
+
+I do. But it's not by mainstream backend developers. 
+
+
+
+The problem with technical debt created by under-engineering is its growing nature. Its not a one time cost, its a cost that you will pay each time you touch the code in the future until you rafactor it. 
+
+Change cost = Actual work * Tech debt interest 
+
+And tech debt interest increases by every change you make to the system. 
+
+Another caveat of under-engineering  is that is being used as an excuse to creating more of it. I see it as an analogy to a broken window theory.
+
+(TODO example- user status, just add another)
+
+
+<h2>Good vs Bad over-engineering</h2>
+I am advocating for over-engineering but there is also bad over-engineering. 
+I am going back to the decision tree. Whenever you are preparing for the future ask yourself how easy to change this will be. How much flexibility it gives me. 
+
+One example of bad over-engineering 
+<pre class="prettyprint lang-java">
+public abstract class Service<PE extends ProductEntity<ID>, 
+        ID extends Long, 
+        R extends Repository<PE, ID>,
+        PS extends ProductSource<? extends Connection>> {
+    // some code
+}
+</pre>
+
+Author of this code wanted to ease creating new Services, whatever it is. The intention was good. But he forget to ask himself one important question. Does it scale? Such code helps us grow by adding more of the same. But completely ties our hands to scaling, adding more of different. 
+
+Key take-aways
+Focus not only on solving problems of your customers but also on your company problems. 
+
+Ask Does it scale? For any piece of code you write and for any decision you make. 
+
+Ask How costly it will be to change this decision? 
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <p>
+          Fowler - design stamina hypothesis
+        </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>
