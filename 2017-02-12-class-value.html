@@ -1,51 +1,6 @@
 <!doctype html>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <title>Dominik Moštěk - Blog</title>
-    <link rel="stylesheet" href="main.css">
-    
+    <meta http-equiv="refresh" content="0; url=https://medium.com/@mostekdominik/classes-as-map-keys-in-java-481bea29fd65" />
   </head>
-  <body>
-    <div class="center">
-        <a href="./index.html">Back to homepage</a>
-        <h1>Classes as Map keys in Java</h1>
-        <p><i>Posted on February 12, 2017</i></p>
-<p>
-By accident I came across this <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ClassValue.html">interesting class</a>. I suggest you to read its source code, its very unusual. But I struggled to understand the purpose of this class. The reason for its existence is even more interesting. 
-</p>
-<p>
-If you need to store the relation between two objects you use a <a href="https:u//docs.oracle.com/javase/8/docs/api/java/util/Map.html">Map</a>, right? But when the key instance is of <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/Class.html">class</a> type it gets more complicated. Best explanation can be found here <a href="https://bugs.openjdk.java.net/browse/JDK-6389107">JDK-6389107</a>. 
-</br></br><b>My TLDR version of it:</b></br>
-When the key in a Map is Class instance, this class instance now cannot be garbage collected. No big deal you might add. But class holds reference to its class loader and this class loader holds references to all classes it has loaded. Now that might be a problem. It can also lead to locking the jar files containing the class files. There are some solutions but they all suck.
-</p>
-<p>
-And here comes the ClassValue utility. It maps classes to some other representation. It does it lazily and caches the result. 
-ClassValue is also thread safe. Thread safety is implemented in very unusual way. Read <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ClassValue.html#get-java.lang.Class-">get method</a> and <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/ClassValue.html#remove-java.lang.Class-">remove method</a> javadoc to grasp the idea. Reading the source code is not that easy though. 
-</p>
-<p>
-<b>
-Be careful when using Classes as keys in your maps!
-</b>
-<p>
-  <p>
-Some links: <br />
-<a href="http://stackoverflow.com/a/32146848/694677)">O answer with some info abou Class value</a> <br />
-<a href="http://stackoverflow.com/questions/2625546/is-using-the-class-instance-as-a-map-key-a-best-practice">Is using the Class instance as a Map key a best practice?</a>
-</p>
-
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
-    <!-- Google Analytics -->
-  <script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    ga('create', 'UA-66877907-1', 'auto');
-    ga('send', 'pageview');
-  </script>
-  <!-- End Google Analytics -->
-  </body>
 </html>
