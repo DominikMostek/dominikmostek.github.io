@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dominik Moštěk - Blog</title>
+    <link rel="stylesheet" href="main.css">
+
+  </head>
+  <body>
+    <div class="center">
+        <a href="./index.html">Back to homepage</a>
+        <h1>Writing code was never the expensive part</h1>
+        <p><i>Posted on July 9, 2026</i></p>
+
+        <p>
+        A few weeks ago I watched an AI agent build a working prototype of an internal tool in one evening. Work that would have taken a good developer two weeks. So when people tell me that code quality stopped mattering — that everyone can code now, that craft is nostalgia — I get where it comes from. I have seen the demo too.
+        </p>
+
+        <p>
+        And they are partially right. For prototypes, quality genuinely does not matter. A prototype exists to answer one question as cheaply as possible, and the correct fate of most prototypes is the trash bin. Polishing one is like ironing a napkin.
+        </p>
+
+        <p>
+        The mistake is extrapolating from the demo to the decade.
+        </p>
+
+        <h2>The bill was never for typing</h2>
+        <p>
+        The most expensive part of software was never writing it. We have known this for longer than most of today's developers have been alive. <a href="https://dl.acm.org/doi/10.1145/358690.358703">Lientz and Swanson measured it around 1980</a>: more than half of all staff effort went into maintenance, and later estimates put maintenance at 60–80 % of the total cost of ownership. Robert Glass collected the same numbers in <i>Facts and Fallacies of Software Engineering</i> and added the detail everyone misses: most of that maintenance is not bug fixing. Roughly 60 % of it is enhancements — pushing new features into old code.
+        </p>
+
+        <p>
+        Maintenance is not the boring epilogue of a project. It is the project.
+        </p>
+
+        <h2>What "maintenance" actually means</h2>
+        <p>
+        The word sounds like oiling a machine. In reality it is almost everything a software organization does after the first release:
+        </p>
+        <ul>
+          <li>Change requests — fitting feature N+1 into code shaped by features 1 through N</li>
+          <li>Finding out how the system <i>actually</i> behaves, as opposed to how everyone believes it behaves</li>
+          <li>Debugging and fixing production issues</li>
+          <li>Onboarding — every new team member pays the comprehension tax in full</li>
+          <li>Raising resilience and security, because the first version never had enough of either</li>
+          <li>Improving performance once real load arrives</li>
+          <li>Migrations — cloud provider, framework, database, that one library that got abandoned</li>
+        </ul>
+        <p>
+        Notice what these have in common. None of them is typing. All of them are <i>understanding</i>. A large field study by <a href="https://dl.acm.org/doi/10.1109/TSE.2017.2734091">Xia et al.</a> tracked 78 professional developers over 3,148 working hours and found they spend about 58 % of their time on program comprehension. The single largest line item in software development is not writing code. It is reading it.
+        </p>
+
+        <h2>AI did not shrink the bill. It moved it downstream.</h2>
+        <p>
+        When producing something gets cheap, you produce more of it — and the bottleneck moves to whatever comes next. Writing code got dramatically cheaper. So we write dramatically more of it. And every cheap line still bills the full price to be read, debugged, secured and migrated.
+        </p>
+        <p>
+        The early data says exactly that. <a href="https://www.gitclear.com/ai_assistant_code_quality_2025_research">GitClear analyzed 211 million changed lines</a> and found an eightfold rise in duplicated code blocks; 2024 was the first year copy/paste outnumbered refactoring, and the share of freshly written code revised within two weeks nearly doubled since 2020. The <a href="https://cloud.google.com/blog/products/devops-sre/announcing-the-2024-dora-report">2024 DORA report</a> measured that a 25 % increase in AI adoption came with a 7.2 % <i>drop</i> in delivery stability: teams ship more and break more. And my favourite, because it is a proper randomized controlled trial: <a href="https://arxiv.org/abs/2507.09089">METR let 16 experienced maintainers</a> work on mature repositories averaging a million lines. With AI they were 19 % slower — while estimating they had been 20 % faster. On exactly the kind of codebase where the money lives, the demo effect flipped its sign.
+        </p>
+        <p>
+        These numbers will age; models improve fast and some of them may look silly in two years. The direction of the incentive will not. Cheap writing means more code, and more code means comprehension gets more expensive, not less.
+        </p>
+
+        <h2>Well-crafted code wins the AI era</h2>
+        <p>
+        Which leads me to a claim that sounds contrarian and is actually just arithmetic: code that is well prepared for operation and change will win <i>because</i> of AI, not despite it. Such code is easy for a human to understand. It is easy to reason about — you can predict what a change does without running the whole system in your head. And changes to it stay local, so they do not spray regressions across the codebase.
+        </p>
+        <p>
+        Here is the twist: every one of those properties helps the model too. Clear seams, small units, honest types, decisions documented next to the code — that is precisely the context in which AI agents stop hallucinating architecture and start being fast. Well-factored code is not a tax on AI velocity. It is the fuel. (And the METR slowdown is, I suspect, largely the price of AI wading through code that was never prepared for anyone to understand it — human or machine.)
+        </p>
+
+        <h2>Who this argument is not aimed at</h2>
+        <p>
+        If you are validating an idea, exploring an API or building a throwaway script — go fast, let the AI write everything, delete it with pride. This argument targets code that survives contact with production. The only real danger in prototype-land is the oldest one in our industry: the "temporary" prototype that meets its first paying customer and is suddenly load-bearing. That code just joined the maintenance economy, whether you planned it or not.
+        </p>
+
+        <h2>Modern problems require traditional solutions</h2>
+        <p>
+        So how do you write code that wins this era? I want to spend the next series of posts showing exactly that, on real production code, pattern by pattern. And I will spoil the punchline now: there is nothing new in it. It is recycled patterns and practices that have been with us since the seventies — <a href="https://dl.acm.org/doi/10.1145/361598.361623">Parnas wrote the information hiding paper in 1972</a> — and they held true every year since. What changed is the speed. When everything accelerates, the practices that quietly paid for themselves over a decade suddenly pay for themselves in a quarter. Modern problems require traditional solutions.
+        </p>
+        <p>
+        First installment is already out: fifteen design lessons extracted from the most boring endpoint we own. It starts with a <a href="https://dominikmostek.cz/2026-07-09-fifteen-lessons-from-one-password-reset.html">password reset</a>.
+        </p>
+
+        <hr />
+        <p><i>Sources: <a href="https://dl.acm.org/doi/10.1145/358690.358703">Lientz &amp; Swanson, Software Maintenance Management (1980)</a>; Robert L. Glass, Facts and Fallacies of Software Engineering (Addison-Wesley, 2002); <a href="https://dl.acm.org/doi/10.1109/TSE.2017.2734091">Xia et al., Measuring Program Comprehension: A Large-Scale Field Study with Professionals (IEEE TSE, 2018)</a>; <a href="https://www.gitclear.com/ai_assistant_code_quality_2025_research">GitClear, AI Copilot Code Quality (2025)</a>; <a href="https://cloud.google.com/blog/products/devops-sre/announcing-the-2024-dora-report">Google, 2024 DORA Report</a>; <a href="https://arxiv.org/abs/2507.09089">Becker et al. (METR), Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity (2025)</a>; <a href="https://dl.acm.org/doi/10.1145/361598.361623">Parnas, On the Criteria To Be Used in Decomposing Systems into Modules (CACM, 1972)</a>.</i></p>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-66877907-1', 'auto');
+    ga('send', 'pageview');
+  </script>
+  <!-- End Google Analytics -->
+  </body>
+</html>
